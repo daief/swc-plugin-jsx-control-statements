@@ -1,6 +1,6 @@
-use swc_common::SyntaxContext;
 use swc_core::common::Spanned;
 use swc_core::common::DUMMY_SP;
+use swc_core::common::SyntaxContext;
 use swc_core::ecma::ast::{
     ArrayLit, CondExpr, Expr, ExprOrSpread, Ident, IdentName, Invalid, JSXAttr, JSXAttrName,
     JSXAttrOrSpread, JSXAttrValue, JSXElement, JSXElementChild, JSXElementName, JSXExpr,
@@ -8,6 +8,7 @@ use swc_core::ecma::ast::{
 };
 use tracing::debug;
 
+use crate::utils::elements::find_first_ident_ctxt_in_jsx_element;
 use crate::utils::playthings::display_error;
 
 pub fn build_key_attribute_value(group: &String, index: usize) -> String {
@@ -297,6 +298,7 @@ pub fn get_for_jsx_element_attributes_ident(jsx_element: &JSXElement, attr_name:
             JSXAttrOrSpread::JSXAttr(JSXAttr { value, .. }) => match value {
                 Some(JSXAttrValue::Lit(Lit::Str(value))) => {
                     let sym = value.value;
+                    let ctxt = find_first_ident_ctxt_in_jsx_element(&jsx_element, &sym).unwrap_or(ctxt);
 
                     Ident {
                         span: DUMMY_SP,

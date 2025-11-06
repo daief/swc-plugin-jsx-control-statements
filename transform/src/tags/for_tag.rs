@@ -1,7 +1,7 @@
-use swc_common::{SyntaxContext, DUMMY_SP};
 use swc_core::atoms::Atom;
 use swc_core::ecma::ast::JSXElement;
 use swc_core::ecma::ast::*;
+use swc_core::common::{DUMMY_SP, SyntaxContext};
 
 use crate::utils::attributes::{
     get_for_jsx_element_attributes_expr, get_for_jsx_element_attributes_ident, get_key_attribute,
