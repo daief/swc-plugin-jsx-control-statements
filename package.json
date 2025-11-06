@@ -1,6 +1,6 @@
 {
-  "name": "swc-plugin-jsx-control-statements",
-  "version": "0.7.1",
+  "name": "@axew/swc-plugin-jsx-control-statements",
+  "version": "0.8.0",
   "description": "SWC plugin for jsx-control-statements",
   "repository": {
     "type": "git",
