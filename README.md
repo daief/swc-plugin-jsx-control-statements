@@ -1,6 +1,8 @@
-# 🦀 JSX control statements for swc
-
 > 📢: This repository is a temporary release for this [PR](https://github.com/intpp/swc-plugin-jsx-control-statements/pull/9).
+> 📢: This repository is a temporary release for this [PR](https://github.com/intpp/swc-plugin-jsx-control-statements/pull/9).
+> 📢: This repository is a temporary release for this [PR](https://github.com/intpp/swc-plugin-jsx-control-statements/pull/9).
+
+# 🦀 JSX control statements for swc
 
 Original idea: [babel-plugin-jsx-control-statements](https://github.com/AlexGilleran/jsx-control-statements)
 
@@ -9,24 +11,24 @@ Original idea: [babel-plugin-jsx-control-statements](https://github.com/AlexGill
 **pnpm** (recommended):
 
 ```shell
-pnpm i -D swc-plugin-jsx-control-statements
+pnpm i -D @axew/swc-plugin-jsx-control-statements
 ```
 
 or **yarn**
 
 ```shell
-yarn add -D swc-plugin-jsx-control-statements
+yarn add -D @axew/swc-plugin-jsx-control-statements
 ```
 
 ## Configure `swc`
 
-In your SWC config, you have to add to [`jsc.experimental.plugins`](https://swc.rs/docs/configuration/compilation#jscexperimentalplugins) - `['swc-plugin-jsx-control-statements', {}]`, like in the following code:
+In your SWC config, you have to add to [`jsc.experimental.plugins`](https://swc.rs/docs/configuration/compilation#jscexperimentalplugins) - `['@axew/swc-plugin-jsx-control-statements', {}]`, like in the following code:
 
 ```javascript
 jsc: {
     experimental: {
         plugins: [
-            ['swc-plugin-jsx-control-statements', {}],
+            ['@axew/swc-plugin-jsx-control-statements', {}],
         ],
     },
 },
