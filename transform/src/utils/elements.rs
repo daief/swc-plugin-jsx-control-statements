@@ -1,10 +1,8 @@
-use swc_core::atoms::Atom;
-use swc_core::common::{SyntaxContext, DUMMY_SP};
+use swc_core::common::DUMMY_SP;
 use swc_core::ecma::ast::{
-    ArrayLit, Expr, ExprOrSpread, JSXElement, JSXElementChild, JSXExpr, JSXExprContainer, JSXText,
+    ArrayLit, Expr, ExprOrSpread, JSXElementChild, JSXExpr, JSXExprContainer, JSXText,
     Lit, Null, Str,
 };
-use swc_core::ecma::visit::{Visit, VisitWith};
 use tracing::debug;
 
 use crate::utils::attributes::{build_key_attribute_value, set_jsx_child_element_key_attribute};
@@ -92,80 +90,4 @@ pub fn wrap_by_child_jsx_expr_container(expr: Expr) -> JSXElementChild {
         span: DUMMY_SP,
         expr: JSXExpr::Expr(Box::new(expr)),
     })
-}
-
-/// date: 2025-11-06
-///
-/// TODO: 💥 This is not perfect yet.
-///
-/// finding ctxt to reuse, when use this plugin in rspack, the ident name in `For` will be renamed.
-///
-/// can resolve this:
-/// ```jsx
-/// // input.js
-/// <For each="item" index="idx" of={list}>
-///     <div>{item.xxx}</div>
-/// </For>
-///
-/// // output.js
-/// list.map(function(item1) { // ✅ <-- after using find_first_ident_ctxt_in_jsx_element this will be corrected
-///     return item.xxx; // cause undefined error
-/// })
-/// ```
-///
-/// But this is still issue:
-///
-/// ```jsx
-/// // input.js
-/// <For each="item" index="idx" of={list}>
-/// {((item2) => {
-///     return item.xxx;
-/// })()}
-/// </For>
-///
-/// // output.js
-/// list.map(function(item1, idx) { // 💥 <-- still issue
-///     return function(item2) {
-///         return item.xxx; // 💥 <-- still issue
-///     }();
-/// }, _this)
-/// ```
-pub fn find_first_ident_ctxt_in_jsx_element(
-    jsx: &JSXElement,
-    target: &Atom,
-) -> Option<SyntaxContext> {
-    let mut v = FindIdentCtxt {
-        target,
-        found: None,
-    };
-    jsx.visit_with(&mut v);
-    v.found
-}
-
-pub struct FindIdentCtxt<'a> {
-    target: &'a Atom,
-    found: Option<SyntaxContext>,
-}
-
-impl<'a> Visit for FindIdentCtxt<'a> {
-    fn visit_expr(&mut self, expr: &Expr) {
-        // skip if found
-        if self.found.is_some() {
-            return;
-        }
-
-        if let Expr::Ident(id) = expr {
-            if &id.sym == self.target {
-                self.found = Some(id.ctxt);
-                return;
-            }
-        }
-
-        expr.visit_children_with(self);
-    }
-
-    /// avoid ident in callee
-    fn visit_callee(&mut self, _node: &swc_core::ecma::ast::Callee) {
-        return;
-    }
 }
