@@ -11,7 +11,7 @@ use crate::utils::elements::convert_children_to_expression;
 use crate::utils::ident_replacer::IdentReplacer;
 
 pub fn convert_jsx_element(jsx_element: &mut JSXElement) -> Expr {
-    let (of_expr, body_expr, each_ident, index_ident) = parse_for_jsx_element(jsx_element.clone());
+    let (of_expr, body_expr, for_idents) = parse_for_jsx_element(jsx_element.clone());
     let group_key = get_key_attribute(jsx_element);
     let mut children_expr =
         convert_children_to_expression(&mut jsx_element.children, group_key.clone());
@@ -30,41 +30,37 @@ pub fn convert_jsx_element(jsx_element: &mut JSXElement) -> Expr {
     }
 
     // use children, make ident ctxt same as `each`, `index`
-    let mut replacer = IdentReplacer {
-        target_sym: each_ident.sym.clone(),
-        target_ctxt: each_ident.ctxt,
-    };
-    children_expr.visit_mut_with(&mut replacer);
+    for ident in &for_idents {
+        if let Some(ident) = ident {
+            let mut replacer = IdentReplacer {
+                target_sym: ident.sym.clone(),
+                target_ctxt: ident.ctxt,
+            };
+            children_expr.visit_mut_with(&mut replacer);
+        }
+    }
 
-    let mut idx_replacer = IdentReplacer {
-        target_sym: index_ident.sym.clone(),
-        target_ctxt: index_ident.ctxt,
-    };
-    children_expr.visit_mut_with(&mut idx_replacer);
-
+    let params = for_idents
+        .into_iter()
+        .map(|ident| Param {
+            span: DUMMY_SP,
+            decorators: Default::default(),
+            pat: Pat::Ident(BindingIdent {
+                id: if ident.is_some() {
+                    ident.unwrap()
+                } else {
+                    Ident::from("_")
+                },
+                type_ann: Default::default(),
+            }),
+        })
+        .collect();
     let map_args_fn = ExprOrSpread {
         spread: None,
         expr: Box::new(Expr::Fn(FnExpr {
             ident: Default::default(),
             function: Box::new(Function {
-                params: vec![
-                    Param {
-                        span: DUMMY_SP,
-                        decorators: Default::default(),
-                        pat: Pat::Ident(BindingIdent {
-                            id: each_ident,
-                            type_ann: Default::default(),
-                        }),
-                    },
-                    Param {
-                        span: DUMMY_SP,
-                        decorators: Default::default(),
-                        pat: Pat::Ident(BindingIdent {
-                            id: index_ident,
-                            type_ann: Default::default(),
-                        }),
-                    },
-                ],
+                params,
                 decorators: Default::default(),
                 span: DUMMY_SP,
                 ctxt: SyntaxContext::empty(),
@@ -87,7 +83,7 @@ pub fn convert_jsx_element(jsx_element: &mut JSXElement) -> Expr {
     get_call_expr(map_args_fn, &of_expr)
 }
 
-pub fn parse_for_jsx_element(jsx_element: JSXElement) -> (Expr, Expr, Ident, Ident) {
+fn parse_for_jsx_element(jsx_element: JSXElement) -> (Expr, Expr, Vec<Option<Ident>>) {
     let each_ident = get_for_jsx_element_attributes_ident(&jsx_element, "each");
     let index_ident = get_for_jsx_element_attributes_ident(&jsx_element, "index");
     let mut of_expr = get_for_jsx_element_attributes_expr(&jsx_element, "of");
@@ -97,7 +93,9 @@ pub fn parse_for_jsx_element(jsx_element: JSXElement) -> (Expr, Expr, Ident, Ide
         of_expr = Expr::Ident(Ident::from(Atom::from("[]")));
     }
 
-    (of_expr, body_expr, each_ident, index_ident)
+    let idents = vec![each_ident, index_ident];
+
+    (of_expr, body_expr, idents)
 }
 
 fn get_call_expr(map_args_fn: ExprOrSpread, of_expr: &Expr) -> Expr {
