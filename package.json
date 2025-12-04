@@ -1,13 +1,13 @@
 {
   "name": "@axew/swc-plugin-jsx-control-statements",
-  "version": "0.7.1000",
+  "version": "0.7.1001",
   "description": "SWC plugin for jsx-control-statements",
   "repository": {
     "type": "git",
-    "url": "https://github.com/intpp/swc-plugin-jsx-control-statements"
+    "url": "https://github.com/daief/swc-plugin-jsx-control-statements"
   },
   "bugs": {
-    "url": "https://github.com/intpp/swc-plugin-jsx-control-statements/issues"
+    "url": "https://github.com/daief/swc-plugin-jsx-control-statements/issues"
   },
   "types": "jsx-control-statements.d.ts",
   "keywords": [
