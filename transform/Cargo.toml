@@ -4,12 +4,12 @@ version = "0.7.1"
 edition = "2021"
 
 [dependencies]
-swc_core = { version = "40.0.0", features = ["ecma_plugin_transform"] }
-tracing = { version = "0.1.40", features = ["release_max_level_off"] }
+swc_core = { version = "64.0.0", features = ["ecma_plugin_transform"] }
+tracing = { version = "0.1.44", features = ["release_max_level_off"] }
 
 [dev-dependencies]
 testing = "18.0.0"
-swc_core = { version = "40.0.0", features = [
+swc_core = { version = "64.0.0", features = [
     "ecma_parser",
     "testing_transform",
 ] }

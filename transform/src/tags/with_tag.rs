@@ -121,8 +121,9 @@ pub fn parse_with_jsx_element(
 
                             values.push(expr_or_spread);
                         }
-                        JSXAttrValue::Lit(lit) => {
-                            values.push(ExprOrSpread::from(Box::new(Expr::Lit(lit.clone()))));
+                        JSXAttrValue::Str(s) => {
+                            values
+                                .push(ExprOrSpread::from(Box::new(Expr::Lit(Lit::Str(s.clone())))));
                         }
                         _ => {}
                     }

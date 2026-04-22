@@ -1,6 +1,7 @@
+use swc_core::atoms::Atom;
 use swc_core::common::Spanned;
-use swc_core::common::DUMMY_SP;
 use swc_core::common::SyntaxContext;
+use swc_core::common::DUMMY_SP;
 use swc_core::ecma::ast::{
     ArrayLit, CondExpr, Expr, ExprOrSpread, Ident, IdentName, Invalid, JSXAttr, JSXAttrName,
     JSXAttrOrSpread, JSXAttrValue, JSXElement, JSXElementChild, JSXElementName, JSXExpr,
@@ -86,11 +87,11 @@ pub fn get_key_attribute(jsx_element: &JSXElement) -> Option<String> {
     let attribute = get_jsx_element_attribute(jsx_element, "key");
 
     if let Some(JSXAttrOrSpread::JSXAttr(JSXAttr {
-        value: Some(JSXAttrValue::Lit(Lit::Str(Str { value, .. }))),
+        value: Some(JSXAttrValue::Str(Str { value, .. })),
         ..
     })) = attribute
     {
-        return Some(value.to_string());
+        return Some(value.as_str().unwrap().to_string());
     }
 
     None
@@ -147,11 +148,11 @@ pub fn set_jsx_element_attribute(
                     has_attribute = true;
 
                     if rewrite {
-                        jsx_attribute.value.replace(JSXAttrValue::Lit(Lit::Str(Str {
+                        jsx_attribute.value.replace(JSXAttrValue::Str(Str {
                             value: value.clone().into(),
                             raw: None,
                             span: DUMMY_SP,
-                        })));
+                        }));
                     }
                 }
             }
@@ -167,11 +168,11 @@ pub fn set_jsx_element_attribute(
                     span: DUMMY_SP,
                     sym: name.into(),
                 }),
-                value: Some(JSXAttrValue::Lit(Lit::Str(Str {
+                value: Some(JSXAttrValue::Str(Str {
                     value: value.into(),
                     raw: None,
                     span: DUMMY_SP,
-                }))),
+                })),
                 span: DUMMY_SP,
             }));
     }
@@ -289,18 +290,20 @@ pub fn get_for_jsx_element_attributes_expr(jsx_element: &JSXElement, attr_name: 
         .unwrap_or(Expr::Invalid(Invalid { span: DUMMY_SP }))
 }
 
-pub fn get_for_jsx_element_attributes_ident(jsx_element: &JSXElement, attr_name: &str) -> Option<Ident> {
+pub fn get_for_jsx_element_attributes_ident(
+    jsx_element: &JSXElement,
+    attr_name: &str,
+) -> Option<Ident> {
     let ctxt = SyntaxContext::empty();
-
 
     get_jsx_element_attribute(jsx_element, attr_name)
         .map(|attr| match attr {
             JSXAttrOrSpread::JSXAttr(JSXAttr { value, .. }) => match value {
-                Some(JSXAttrValue::Lit(Lit::Str(value))) => {
+                Some(JSXAttrValue::Str(value)) => {
                     let sym = value.value;
                     Some(Ident {
                         span: DUMMY_SP,
-                        sym,
+                        sym: Atom::from(sym.as_str().unwrap()),
                         ctxt,
                         optional: Default::default(),
                     })
