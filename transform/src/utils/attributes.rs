@@ -66,6 +66,8 @@ pub fn get_condition_expression(jsx_element: &JSXElement) -> Expr {
 
                 Expr::Lit(Lit::Bool(false.into()))
             }
+            #[cfg(swc_ast_unknown)]
+            _ => panic!("unknown attribute type"),
         })
         .unwrap_or_else(|| {
             let element_name = get_jsx_element_name(&jsx_element.opening.name);
@@ -118,6 +120,8 @@ pub fn validate_jsx_control_statement_attributes(jsx_element: &JSXElement) {
                                                    }) => {
                         display_error(*span, "Unsupported: Namespaced name for JSX control statement tag's prop!");
                     },
+                    #[cfg(swc_ast_unknown)]
+                    _ => panic!("unknown attribute name type"),
                 },
                 JSXAttrOrSpread::SpreadElement(SpreadElement { dot3_token, .. }) => {
                     display_error(
@@ -125,6 +129,8 @@ pub fn validate_jsx_control_statement_attributes(jsx_element: &JSXElement) {
                         "Unsupported: Spread operator disallowed for JSX control statement tags!",
                     );
                 }
+                #[cfg(swc_ast_unknown)]
+                _ => panic!("unknown attribute type"),
             }
         });
 }
@@ -286,6 +292,8 @@ pub fn get_for_jsx_element_attributes_expr(jsx_element: &JSXElement, attr_name: 
 
                 Expr::Invalid(Invalid { span: DUMMY_SP })
             }
+            #[cfg(swc_ast_unknown)]
+            _ => panic!("unknown attribute type"),
         })
         .unwrap_or(Expr::Invalid(Invalid { span: DUMMY_SP }))
 }
@@ -321,6 +329,8 @@ pub fn get_for_jsx_element_attributes_ident(
 
                 None
             }
+            #[cfg(swc_ast_unknown)]
+            _ => panic!("unknown attribute type"),
         })
         .unwrap_or(None)
 }

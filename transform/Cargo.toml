@@ -13,3 +13,6 @@ swc_core = { version = "64.0.0", features = [
     "ecma_parser",
     "testing_transform",
 ] }
+
+[lints.rust]
+unexpected_cfgs = { level = "allow", check-cfg = ['cfg(swc_ast_unknown)'] }

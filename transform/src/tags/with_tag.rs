@@ -117,6 +117,8 @@ pub fn parse_with_jsx_element(
                                     })))
                                 }
                                 JSXExpr::Expr(expr) => ExprOrSpread::from(expr.clone()),
+                                #[cfg(swc_ast_unknown)]
+                                _ => panic!("unknown JSX expression type"),
                             };
 
                             values.push(expr_or_spread);
@@ -135,6 +137,8 @@ pub fn parse_with_jsx_element(
                     "Unsupported: Spread operator disallowed for JSX control statement tags!",
                 );
             }
+            #[cfg(swc_ast_unknown)]
+            _ => panic!("unknown attribute type"),
         });
 
     values.insert(
